@@ -1,5 +1,5 @@
-import { useContext, useRef, useEffect } from "react";
-import { PlayerContext } from "../../contexts/PlayerContexts";
+import { useRef, useEffect } from "react";
+import { usePlayer } from "../../contexts/PlayerContexts";
 import Image from "next/image";
 import Slider from "rc-slider";
 
@@ -14,9 +14,15 @@ export function Player() {
 		episodeList,
 		currentEpisodeIndex,
 		isPlaying,
+		isLooping,
+		playNext,
+		playPrevious,
 		togglePlay,
+		toggleLoop,
 		setPlayingState,
-	} = useContext(PlayerContext);
+		hasPrevious,
+		hasNext,
+	} = usePlayer();
 
 	useEffect(() => {
 		if (!audioRef.current) {
@@ -80,6 +86,7 @@ export function Player() {
 					<audio
 						src={episode.url}
 						autoPlay
+						loop={isLooping}
 						ref={audioRef}
 						onPlay={() => setPlayingState(true)}
 						onPause={() => setPlayingState(false)}
@@ -90,7 +97,11 @@ export function Player() {
 					<button type="button" disabled={!episode}>
 						<img src="/shuffle.svg" alt="Embaralhar" />
 					</button>
-					<button type="button" disabled={!episode}>
+					<button
+						type="button"
+						disabled={!episode || !hasPrevious}
+						onClick={() => playPrevious()}
+					>
 						<img src="/play-previous.svg" alt="Tocar anterior" />
 					</button>
 					<button
@@ -105,10 +116,19 @@ export function Player() {
 							<img src="/play.svg" alt="Tocar" />
 						)}
 					</button>
-					<button type="button" disabled={!episode}>
+					<button
+						type="button"
+						disabled={!episode || !hasNext}
+						onClick={() => playNext()}
+					>
 						<img src="/play-next.svg" alt="Tocar próxima" />
 					</button>
-					<button type="button" disabled={!episode}>
+					<button
+						type="button"
+						disabled={!episode}
+						onClick={() => toggleLoop()}
+						className={isLooping ? styles.isActive : ""}
+					>
 						<img src="/repeat.svg" alt="Repetir" />
 					</button>
 				</div>
